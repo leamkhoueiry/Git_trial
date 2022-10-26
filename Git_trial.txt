@@ -1,0 +1,206 @@
+
+public class BinarySearchTree 
+{
+	private BSTNode root;
+	public BinarySearchTree()
+	{
+		root = null;
+	}
+	public BSTNode getRoot() {
+		return root;
+	}
+	public void setRoot(BSTNode root) {
+		this.root = root;
+	}
+	public int getSize(BSTNode node)
+	{
+		//return number of nodes in the tree from node
+		if (node ==null)
+			return 0;
+		else
+			return getSize(node.getLeft())+ getSize(node.getRight())+1;
+	}
+	public void displayTreeDesign(BSTNode node, int count)
+	{
+		// prints the tree in a in-order traversal way (left, root, right) with a design depending on the position of each node
+		count = getSize(node);
+		if (node.getLeft() != null && node!= null)
+			displayTreeDesign(node.getLeft(), count);
+		String tabs = " ".repeat(count);
+		System.out.println(tabs +node.wordString() );
+		if (node.getRight()!= null && node!= null)
+				displayTreeDesign(node.getRight(), count);
+		
+	}
+
+
+	public void insertInfo(BSTNode node, String _word,String _description) //considering that i always start from the root of the tree
+	{
+		if (node == null)
+		{
+			root = new BSTNode(_word, _description);
+			
+		}
+		else
+			if (_word.compareToIgnoreCase(node.getWord()) <=0)
+			{
+				if (node.getLeft()!= null)
+					 insertInfo(node.getLeft(), _word, _description);
+				else
+					node.setLeft(new BSTNode(_word,_description));
+			}
+			else 
+				if (_word.compareToIgnoreCase(node.getWord())>0)
+				{
+					if (node.getRight()!= null)
+						insertInfo(node.getRight(), _word, _description);
+					else 
+						node.setRight(new BSTNode(_word, _description));
+				}
+				
+	}
+	public boolean findDefinition (BSTNode node, String _word, String _description)
+	{
+		// return true if the definition (word and description) is in the tree, false otherwise
+		if (node == null)
+			return false;
+		else if ((node.getWord().equalsIgnoreCase(_word)) && (node.getDescription().equalsIgnoreCase(_description)))
+			return true;
+		else if (node.getWord().compareToIgnoreCase(_word)> 0)
+			return findDefinition (node.getLeft(), _word, _description);
+		else
+			return findDefinition(node.getRight(), _word, _description);
+		
+	}
+	public BSTNode findDefinitionLoc (BSTNode node, String _word, String _description)
+	{
+		// return node if the definition (word and description) is in the tree, null otherwise
+		if (node == null)
+			return null;
+		else if ((node.getWord().equalsIgnoreCase(_word)) && (node.getDescription().equalsIgnoreCase(_description)))
+			return node;
+		else if (node.getWord().compareToIgnoreCase(_word)> 0)
+			return findDefinitionLoc (node.getLeft(), _word, _description);
+		else
+			return findDefinitionLoc(node.getRight(), _word, _description);
+		
+	}
+	public boolean findWord(BSTNode node, String _word)
+	{//return true if the word is in the tree, false otherwise
+		if (node == null)
+			return false;
+		else if ((node.getWord().equalsIgnoreCase(_word)) )
+			return true;
+		else if (node.getWord().compareToIgnoreCase(_word)> 0)
+			return findWord (node.getLeft(), _word);
+		else
+			return findWord(node.getRight(), _word);
+	}
+	
+	public BSTNode findWordLocation(BSTNode node, String _word)
+	{//return node if the word is in the tree, null otherwise
+		//first occurence of this word from node entered in parameter
+		if (node == null)
+			return null;
+		else if ((node.getWord().equalsIgnoreCase(_word)) )
+			return node;
+		else if (node.getWord().compareToIgnoreCase(_word)> 0)
+			return findWordLocation (node.getLeft(), _word);
+		else
+			return findWordLocation(node.getRight(), _word);
+	}
+	public BSTNode findParentLocation(BSTNode node, String _word, BSTNode parent)
+	{// return the parent node of the word to find in the tree, null is the tree is empty
+		
+		if (node == null)
+			return null;
+		else if ((node.getWord().equalsIgnoreCase(_word)) )
+			return parent;
+		else if (node.getWord().compareToIgnoreCase(_word)> 0)
+		{
+			parent = node;
+			return findParentLocation (node.getLeft(), _word,parent);
+		}
+			
+		else
+		{
+			parent = node;
+			return findParentLocation(node.getRight(), _word,parent);
+		}
+	}
+	public int findHomonyme (BSTNode node, String _word)
+	{// return the number of homonyme for each word
+		int count =0;
+		BSTNode search =this.findWordLocation(node,  _word);
+		while (search!= null)
+		{
+			search =findWordLocation(search.getLeft(), _word);
+			count++;
+		
+		}
+		
+		return count;
+	}
+	public BSTNode findMinimum(BSTNode node)
+	{// find minimum value in the tree
+		if (node.getLeft()==null)
+			return node;
+		else
+		{
+			return findMinimum(node.getLeft());
+		}
+	}
+	
+	public boolean removeWord(BSTNode node)
+	{// remove word, 4 cases may occur
+		if (root == null)
+			return false;
+		else
+		{
+			BSTNode in_tree = findWordLocation(root, node.getWord());
+			BSTNode parent_node= findParentLocation(root, node.getWord(),root);
+			if (in_tree.isLeaf()) // if the node has no child
+			{
+				if (parent_node.getLeft().equals(in_tree))
+					parent_node.setLeft(null);
+				else
+					parent_node.setRight(null);
+				
+				return true;
+			}
+			else
+				if (in_tree.getLeft()!= null && in_tree.getRight()==null)// if the node has a left child
+				{
+					in_tree.setWord(in_tree.getLeft().getWord());
+					in_tree.setDescription(in_tree.getLeft().getDescription());
+					in_tree.setLeft(null);
+					
+				
+				}
+				else
+					if (in_tree.getLeft()==null && in_tree.getRight()!=null)// if the node has right child
+					{
+						in_tree.setWord(in_tree.getRight().getWord());
+						in_tree.setDescription(in_tree.getRight().getDescription());
+						in_tree.setRight(null);
+						
+					}
+				else
+					if (in_tree.getLeft()!= null && in_tree.getRight() != null )// if the node has 2 children
+						//i change the node with the one that comes directly after it
+						//it is the minimum in the right side of the node
+					{
+						BSTNode to_change =findMinimum(in_tree.getRight());
+						in_tree.setWord(to_change.getWord());
+						in_tree.setDescription(to_change.getDescription());
+						BSTNode parent_change = findParentLocation(root, to_change.getWord(),root);
+						parent_change = null;
+						
+					}
+						return true;	
+		}
+			
+	}
+
+}
+Trying to setup Git
