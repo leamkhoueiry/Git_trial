@@ -204,3 +204,5 @@ public class BinarySearchTree
 
 }
 Trying to setup Git
+Trying to add a new line of text in this file
+adding a text 
